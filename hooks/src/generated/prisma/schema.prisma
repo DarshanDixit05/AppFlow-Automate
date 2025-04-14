@@ -44,11 +44,12 @@ model TriggerType {
 }
 
 model Action {
-  id         String     @id @default(uuid())
-  actionId   String
-  actionType ActionType @relation(fields: [actionId], references: [id])
-  zapId      String
-  zap        Zap        @relation(fields: [zapId], references: [id])
+  id             String     @id @default(uuid())
+  actionId       String
+  actionType     ActionType @relation(fields: [actionId], references: [id])
+  zapId          String
+  zap            Zap        @relation(fields: [zapId], references: [id])
+  executionOrder Int        @default(-1)
 }
 
 model ActionType {

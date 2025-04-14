@@ -32,7 +32,8 @@ function main() {
                     value: run.zapRunId,
                 }))
             });
-            yield new Promise((resolve) => setTimeout(resolve, 3000));
+            // await new Promise((resolve) => setTimeout(resolve, 3000))
+            //delete outbox zap runs after pusing into queue
             yield prisma.zapRunOutbox.deleteMany({
                 where: {
                     id: {
