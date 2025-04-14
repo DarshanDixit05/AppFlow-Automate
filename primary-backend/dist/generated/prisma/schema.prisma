@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String
+  email    String
+  password String
+  zap      Zap[]
+}
+
+model Zap {
+  id        String   @id @default(uuid())
+  triggerId String?
+  trigger   Trigger?
+  action    Action[]
+  zapRuns   ZapRun[]
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Trigger {
+  id          String      @id @default(uuid())
+  zapId       String      @unique
+  zap         Zap         @relation(fields: [zapId], references: [id])
+  triggerId   String
+  triggerType TriggerType @relation(fields: [triggerId], references: [id])
+}
+
+model TriggerType {
+  id          String    @id @default(uuid())
+  triggerType String
+  triggers    Trigger[]
+}
+
+model Action {
+  id             String     @id @default(uuid())
+  actionId       String
+  actionType     ActionType @relation(fields: [actionId], references: [id])
+  zapId          String
+  zap            Zap        @relation(fields: [zapId], references: [id])
+  executionOrder Int        @default(-1)
+}
+
+model ActionType {
+  id         String   @id @default(uuid())
+  actionType String
+  action     Action[]
+}
+
+model ZapRun {
+  id           String        @id @default(uuid())
+  zapId        String
+  zap          Zap           @relation(fields: [zapId], references: [id])
+  zapRunOutbox ZapRunOutbox?
+  metaData     Json
+}
+
+model ZapRunOutbox {
+  id       String @id @default(uuid())
+  zapRunId String @unique
+  zapRun   ZapRun @relation(fields: [zapRunId], references: [id])
+}
