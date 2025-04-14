@@ -20,7 +20,6 @@ app.use(express_1.default.json());
 app.post("/hooks/catch/:userId/:zapId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, zapId } = req.params;
     const body = req.body;
-    console.log(req);
     // add the zap activity in db
     yield prisma.$transaction(() => __awaiter(void 0, void 0, void 0, function* () {
         const zapRun = yield prisma.zapRun.create({
@@ -35,6 +34,9 @@ app.post("/hooks/catch/:userId/:zapId", (req, res) => __awaiter(void 0, void 0, 
             }
         });
     }));
+    res.json({
+        message: "Zap run added successfully"
+    });
 }));
 app.listen(8080, () => {
     console.log("Server is running on port 8080");
