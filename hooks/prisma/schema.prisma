@@ -13,3 +13,60 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User{
+  id         Int @id @default(autoincrement())
+  username   String
+  email      String
+  password   String
+}
+
+model Zap{
+  id         String @id @default(uuid())
+  triggerId  String?
+  trigger    Trigger?
+  action     Action[]
+  zapRuns    ZapRun[]
+}
+
+model Trigger{
+  id         String @id @default(uuid())
+  zapId      String @unique
+  zap        Zap @relation(fields: [zapId], references: [id])
+  triggerId  String
+  triggerType  TriggerType @relation(fields: [triggerId], references: [id])
+}
+
+model TriggerType{
+  id           String @id @default(uuid())
+  triggerType  String 
+  triggers     Trigger[]
+}
+
+model Action{
+  id         String @id @default(uuid())
+  actionId   String
+  actionType  ActionType @relation(fields: [actionId], references: [id])
+  zapId      String
+  zap        Zap @relation(fields: [zapId], references: [id])
+}
+
+model ActionType{
+  id         String @id @default(uuid())
+  actionType String
+  action      Action[]  
+}
+
+model ZapRun{
+  id           String @id @default(uuid())
+  zapId        String
+  zap          Zap  @relation(fields: [zapId], references: [id])
+  zapRunOutbox ZapRunOutbox?
+  metaData     Json
+}
+
+model ZapRunOutbox{
+  id         String @id @default(uuid())
+  zapRunId   String @unique
+  zapRun     ZapRun @relation(fields: [zapRunId], references: [id])
+}
