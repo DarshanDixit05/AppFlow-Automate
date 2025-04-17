@@ -15,11 +15,19 @@ function useAvailableActionsAndTriggers() {
     const [availableTriggers, setAvailableTriggers] = useState([]);
 
     useEffect(() => {
-        axios.get(`${BACKEND_URL}/api/v1/trigger/available`)
-            .then(x => setAvailableTriggers(x.data.availableTriggers))
+        axios.get(`${BACKEND_URL}/api/v1/trigger/available`, {
+            headers:{
+                Authorization: localStorage.getItem("token")
+            }
+        })
+            .then(x => setAvailableTriggers(x.data.triggers))
 
-        axios.get(`${BACKEND_URL}/api/v1/action/available`)
-            .then(x => setAvailableActions(x.data.availableActions))
+        axios.get(`${BACKEND_URL}/api/v1/action/available`, {
+            headers:{
+                Authorization: localStorage.getItem("token")
+            }
+        })
+            .then(x => setAvailableActions(x.data.actions))
     }, [])
 
     return {
@@ -28,6 +36,7 @@ function useAvailableActionsAndTriggers() {
     }
 }
 
+
 export default function() {
     const router = useRouter();
     const { availableActions, availableTriggers } = useAvailableActionsAndTriggers();
@@ -35,6 +44,7 @@ export default function() {
         id: string;
         name: string;
     }>();
+    
 
     const [selectedActions, setSelectedActions] = useState<{
         index: number;

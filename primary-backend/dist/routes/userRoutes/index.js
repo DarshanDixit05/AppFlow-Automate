@@ -26,7 +26,7 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
     const parsedBody = userSchema_1.UserSignUpSchema.safeParse(body);
     if (!parsedBody.success) {
         res.status(411).json({ message: "Incorrect inputs" });
-        return; // Exit the function early
+        return;
     }
     const userExists = yield prisma.user.findFirst({
         where: {
@@ -35,7 +35,7 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
     });
     if (userExists) {
         res.status(409).json({ message: "User already exists" });
-        return; // Exit the function early
+        return;
     }
     const { username, email, password } = parsedBody.data;
     yield prisma.user.create({
