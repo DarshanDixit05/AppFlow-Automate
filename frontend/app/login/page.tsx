@@ -13,6 +13,20 @@ export default function() {
     const [password, setPassword] = useState("");
     const router = useRouter();
     
+
+    const handleSubmit = async () => {
+        const data = {
+            email: email,
+            password: password,
+        }
+        try {
+            const res = await axios.post(`${BACKEND_URL}/api/v1/user/signin`,data)
+            localStorage.setItem("token", res.data.token);
+            router.push("/dashboard");
+        } catch (error) {
+            console.log(error);
+        }
+    }
     return <div> 
         <Appbar />
         <div className="flex justify-center">
@@ -38,14 +52,7 @@ export default function() {
                         setPassword(e.target.value);
                     }} label={"Password"} type="password" placeholder="Password"></Input>
                     <div className="pt-4">
-                        <PrimaryButton onClick={async () => {
-                            const res = await axios.post(`${BACKEND_URL}/api/v1/user/signin`, {
-                                username: email,
-                                password,
-                            });
-                            localStorage.setItem("token", res.data.token);
-                            router.push("/dashboard");
-                        }} size="big">Login</PrimaryButton>
+                        <PrimaryButton onClick={handleSubmit} size="big">Login</PrimaryButton>
                     </div>
                 </div>
             </div>

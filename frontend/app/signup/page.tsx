@@ -14,6 +14,23 @@ export default function() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+
+    const handleSubmit = async()=>{
+        const data = {
+            username: name,
+            email: email,
+            password: password,
+        }
+
+        try {
+            const response = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, data);
+            console.log(response.data);
+            router.push("/login");
+        } catch (error) {
+            console.error("Error signing up:", error);
+        }
+    }
+
     return <div> 
         <Appbar />
         <div className="flex justify-center">
@@ -43,14 +60,7 @@ export default function() {
                     }} label={"Password"} type="password" placeholder="Password"></Input>
 
                     <div className="pt-4">
-                        <PrimaryButton onClick={async () => {
-                            const res = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
-                                username: email,
-                                password,
-                                name
-                            });
-                            router.push("/login");
-                        }} size="big">Get started free</PrimaryButton>
+                        <PrimaryButton onClick={handleSubmit} size="big">Get started free</PrimaryButton>
                     </div>
                 </div>
             </div>

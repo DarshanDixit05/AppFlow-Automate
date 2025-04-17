@@ -26,22 +26,24 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
     const parsedBody = userSchema_1.UserSignUpSchema.safeParse(body);
     if (!parsedBody.success) {
         res.status(411).json({ message: "Incorrect inputs" });
+        return; // Exit the function early
     }
     const userExists = yield prisma.user.findFirst({
         where: {
-            email: (_a = parsedBody.data) === null || _a === void 0 ? void 0 : _a.email
-        }
+            email: (_a = parsedBody.data) === null || _a === void 0 ? void 0 : _a.email,
+        },
     });
     if (userExists) {
         res.status(409).json({ message: "User already exists" });
+        return; // Exit the function early
     }
     const { username, email, password } = parsedBody.data;
     yield prisma.user.create({
         data: {
             username: username,
             email: email,
-            password: password
-        }
+            password: password,
+        },
     });
     res.status(200).json({ message: "User signed up successfully" });
 }));
@@ -50,19 +52,21 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
     const parsedBody = userSchema_1.UserSignInSchema.safeParse(body);
     if (!parsedBody.success) {
         res.status(411).json({ message: "Incorrect inputs" });
+        return;
     }
     const { email, password } = parsedBody.data;
     const user = yield prisma.user.findFirst({
         where: {
             email: email,
-            password: password
-        }
+            password: password,
+        },
     });
     if (!user) {
         res.status(409).json({ message: "User does not exist" });
+        return;
     }
     const token = jsonwebtoken_1.default.sign({
-        id: user === null || user === void 0 ? void 0 : user.id
+        id: user === null || user === void 0 ? void 0 : user.id,
     }, config_1.JWT_SECRET);
     res.status(200).json({ token: token, message: "User signed in successfully" });
 }));
@@ -71,15 +75,19 @@ router.get("/", middleware_1.default, (req, res) => __awaiter(void 0, void 0, vo
     const id = req.id;
     const user = yield prisma.user.findFirst({
         where: {
-            id: id
-        }
+            id: id,
+        },
     });
     if (!user) {
         res.status(409).json({ message: "User does not exist" });
+        return;
     }
-    res.status(200).json({ user: {
+    res.status(200).json({
+        user: {
             username: user === null || user === void 0 ? void 0 : user.username,
             email: user === null || user === void 0 ? void 0 : user.email,
-        }, message: "User data fetched successfully" });
+        },
+        message: "User data fetched successfully",
+    });
 }));
 exports.default = router;

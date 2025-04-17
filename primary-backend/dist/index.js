@@ -12,6 +12,6 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use("/api/v1/user", index_js_1.default);
 app.use("/api/v1/zap", index_js_2.default);
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
+app.listen(1999, () => {
+    console.log("Server is running on port 1999");
 });

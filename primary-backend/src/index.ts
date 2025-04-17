@@ -11,6 +11,6 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/zap", zapRoutes);
 
 
-app.listen(3000, () => {    
-    console.log("Server is running on port 3000");
+app.listen(1999, () => {    
+    console.log("Server is running on port 1999");
 })
