@@ -9,7 +9,12 @@ router.get("/available", authMiddleWare, async (req, res): Promise<void> => {
     try {
         const availableActions = await prisma.actionType.findMany({})
         res.status(200).json({
-            actions: availableActions,
+            actions: availableActions.map((action)=>{
+                return{
+                    id:action.id,
+                    name:action.actionType
+                }
+            }),
             message: "Available actions fetched successfully"
         })
     } catch (error) {

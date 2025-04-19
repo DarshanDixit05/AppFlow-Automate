@@ -91,6 +91,7 @@ router.get("/", authMiddleWare, async (req, res): Promise<void> => {
 
     res.status(200).json({
         user: {
+            id: user?.id,
             username: user?.username,
             email: user?.email,
         },

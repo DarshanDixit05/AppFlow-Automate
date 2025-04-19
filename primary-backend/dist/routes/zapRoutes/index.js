@@ -25,6 +25,7 @@ router.post("/create", middleware_1.default, (req, res) => __awaiter(void 0, voi
     const parsedZapCreateBody = zapSchema_1.ZapCreateShema.safeParse(body);
     if (!parsedZapCreateBody.success) {
         res.status(400).json({ message: "Invalid inputs to create zap" });
+        return;
     }
     try {
         yield prisma.$transaction(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -35,7 +36,7 @@ router.post("/create", middleware_1.default, (req, res) => __awaiter(void 0, voi
                     triggerId: "",
                     userId: parseInt(userId),
                     action: {
-                        create: (_a = parsedZapCreateBody.data) === null || _a === void 0 ? void 0 : _a.action.map((action, index) => {
+                        create: (_a = parsedZapCreateBody.data) === null || _a === void 0 ? void 0 : _a.actions.map((action, index) => {
                             return {
                                 actionId: action.actionId,
                                 executionOrder: index
@@ -77,8 +78,16 @@ router.get("/:zapId", middleware_1.default, (req, res) => __awaiter(void 0, void
                 userId: userId
             },
             include: {
-                action: true,
-                trigger: true
+                action: {
+                    include: {
+                        actionType: true,
+                    }
+                },
+                trigger: {
+                    include: {
+                        triggerType: true
+                    }
+                }
             }
         });
         res.status(200).json({ zap: zap, message: "Zap updated successfully" });
@@ -97,8 +106,16 @@ router.get("/", middleware_1.default, (req, res) => __awaiter(void 0, void 0, vo
                 userId: userId
             },
             include: {
-                action: true,
-                trigger: true
+                action: {
+                    include: {
+                        actionType: true,
+                    }
+                },
+                trigger: {
+                    include: {
+                        triggerType: true
+                    }
+                }
             }
         });
         res.status(200).json({ zaps: zaps, message: "Zap data fetched successfully" });

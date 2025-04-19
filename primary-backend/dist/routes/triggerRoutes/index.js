@@ -21,7 +21,12 @@ router.get("/available", middleware_1.default, (req, res) => __awaiter(void 0, v
     try {
         const availableTriggers = yield prisma.triggerType.findMany({});
         res.status(200).json({
-            triggers: availableTriggers,
+            triggers: availableTriggers.map((trigger) => {
+                return {
+                    id: trigger.id,
+                    name: trigger.triggerType
+                };
+            }),
             message: "Available triggers fetched successfully"
         });
     }

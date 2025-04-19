@@ -84,6 +84,7 @@ router.get("/", middleware_1.default, (req, res) => __awaiter(void 0, void 0, vo
     }
     res.status(200).json({
         user: {
+            id: user === null || user === void 0 ? void 0 : user.id,
             username: user === null || user === void 0 ? void 0 : user.username,
             email: user === null || user === void 0 ? void 0 : user.email,
         },

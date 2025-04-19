@@ -21,7 +21,12 @@ router.get("/available", middleware_1.default, (req, res) => __awaiter(void 0, v
     try {
         const availableActions = yield prisma.actionType.findMany({});
         res.status(200).json({
-            actions: availableActions,
+            actions: availableActions.map((action) => {
+                return {
+                    id: action.id,
+                    name: action.actionType
+                };
+            }),
             message: "Available actions fetched successfully"
         });
     }

@@ -9,7 +9,12 @@ router.get("/available", authMiddleWare, async(req, res): Promise<void> => {
     try {
         const availableTriggers = await prisma.triggerType.findMany({})
         res.status(200).json({
-            triggers:availableTriggers,
+            triggers:availableTriggers.map((trigger)=>{
+                return{
+                    id:trigger.id,
+                    name:trigger.triggerType
+                }
+            }),
             message:"Available triggers fetched successfully"
         })
     } catch (error) {
