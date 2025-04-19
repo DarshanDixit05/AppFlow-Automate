@@ -23,7 +23,6 @@ export default function() {
 
         try {
             const response = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, data);
-            console.log(response.data);
             router.push("/login");
         } catch (error) {
             console.error("Error signing up:", error);

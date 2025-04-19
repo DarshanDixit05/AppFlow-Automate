@@ -4,7 +4,6 @@ import { BACKEND_URL } from "@/app/config";
 import { Appbar } from "@/components/Appbar";
 import { Input } from "@/components/Input";
 import { ZapCell } from "@/components/ZapCell";
-import { LinkButton } from "@/components/buttons/LinkButton";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -20,14 +19,26 @@ function useAvailableActionsAndTriggers() {
                 Authorization: localStorage.getItem("token")
             }
         })
-            .then(x => setAvailableTriggers(x.data.triggers))
+            .then(x => setAvailableTriggers(x.data.triggers?.map((trigger: { id: string; name: string; })=>{
+                return{
+                    id: trigger.id,
+                    name: trigger.name,
+                    image: `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_BUCKET_REGION}.amazonaws.com/icons/triggers/${trigger.name}.svg`
+                }
+            })))
 
         axios.get(`${BACKEND_URL}/api/v1/action/available`, {
             headers:{
                 Authorization: localStorage.getItem("token")
             }
         })
-            .then(x => setAvailableActions(x.data.actions))
+            .then(x => setAvailableActions(x.data.actions?.map((action: {id: string, name:string})=>{
+                return {
+                    id:action.id,
+                    name:action.name,
+                    image: `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_BUCKET_REGION}.amazonaws.com/icons/actions/${action.name}.svg`
+                }
+            })))
     }, [])
 
     return {
@@ -54,30 +65,28 @@ export default function() {
     }[]>([]);
     const [selectedModalIndex, setSelectedModalIndex] = useState<null | number>(null);
 
+    const handlePublish = async() =>{
+        if (!selectedTrigger?.id) {
+            return;
+        }
+
+        const response = await axios.post(`${BACKEND_URL}/api/v1/zap/create`, {
+            "triggerId": selectedTrigger.id,
+            "actions": selectedActions.map(a => ({
+                actionId: a.availableActionId,
+            }))
+        }, {
+            headers: {
+                Authorization: localStorage.getItem("token")
+            }
+        })
+        router.push("/dashboard");
+    }
+
     return <div>
         <Appbar />
         <div className="flex justify-end bg-slate-200 p-4">
-            <PrimaryButton onClick={async () => {
-                if (!selectedTrigger?.id) {
-                    return;
-                }
-
-                const response = await axios.post(`${BACKEND_URL}/api/v1/zap`, {
-                    "availableTriggerId": selectedTrigger.id,
-                    "triggerMetadata": {},
-                    "actions": selectedActions.map(a => ({
-                        availableActionId: a.availableActionId,
-                        actionMetadata: a.metadata
-                    }))
-                }, {
-                    headers: {
-                        Authorization: localStorage.getItem("token")
-                    }
-                })
-                
-                router.push("/dashboard");
-
-            }}>Publish</PrimaryButton>
+            <PrimaryButton onClick={handlePublish}>Publish</PrimaryButton>
         </div>
         <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center">
             <div className="flex justify-center w-full">
@@ -139,7 +148,6 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
         name: string;
     }>();
     const isTrigger = index === 1;
-
     return <div className="fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-slate-100 bg-opacity-70 flex">
         <div className="relative p-4 w-full max-w-2xl max-h-full">
             <div className="relative bg-white rounded-lg shadow ">
@@ -157,14 +165,14 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
                     </button>
                 </div>
                 <div className="p-4 md:p-5 space-y-4">
-                    {step === 1 && selectedAction?.id === "email" && <EmailSelector setMetadata={(metadata) => {
+                    {step === 1 && selectedAction?.name === "email" && <EmailSelector setMetadata={(metadata) => {
                         onSelect({
                             ...selectedAction,
                             metadata
                         })
                     }} />}
 
-                    {(step === 1 && selectedAction?.id === "send-sol") && <SolanaSelector setMetadata={(metadata) => {
+                    {(step === 1 && selectedAction?.name === "send-sol") && <SolanaSelector setMetadata={(metadata) => {
                         onSelect({
                             ...selectedAction,
                             metadata
